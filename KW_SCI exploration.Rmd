@@ -18,40 +18,42 @@ library(scales)
 
 ```{r}
 #loaddata
+#SCI
 kelpWatch_SCI <- read_csv("kelpWatch_SCI.csv")
 View(kelpWatch_SCI)
+
+#SRI
+kelpWatch_SRI <- read_csv("kelpWatch_SRI.csv")
+View(kelpWatch_SRI)
+
 ```
 
 
 ```{r}
-#data exploration
+#data exploration - SCI
 SCI_full <- kelpWatch_SCI %>%
   filter(!is.na(sum_m2))%>%
   group_by(year)%>%
-  summarise(total_kelpm2 = sum(sum_m2))
- # mutate(Receiving_County= fct_reorder(Receiving_County,total_applied))
+  summarise(total_kelpm2_SCI = sum(sum_m2))%>%
+   mutate(total_kelp_normalized_SCI = total_kelpm2_SCI/108393)%>%
+  mutate(Island_SCI= "SCI")
 
-bar_chart <-ggplot(data=SCI_full, aes(x=year, y=total_kelpm2)) +
-  geom_bar(stat="identity")+
+
+View(SCI_full)
+bar_chart_full_SCI <-ggplot(data=SCI_full, aes(x=year, y=total_kelpm2_SCI)) +
+  geom_bar(stat="identity",fill = "darkgreen")+
   scale_y_continuous(labels = comma)+
   scale_x_continuous(breaks=seq(1984, 2020, by = 6))+
-  theme_light()+
+  theme_classic()+
   xlab("Year") + 
   ylab("Kelp Canopy Coverage - full SCI (m2)")
 
-  
-  bar_chart
+  bar_chart_full_SCI
 
-
-
-png(file="C:/Users/v.r.saccomanno.TNC/Box/GitHub/kelp/kelp/SCI_full.png",
-width=1000, height=550)
-plot(bar_chart)
-dev.off()
 
 bmp(file="SCI_full.bmp",
 width=10, height=5, units="in", res=300)
-plot(bar_chart)
+plot(bar_chart_full)
 dev.off()
 
 #2000-2020
@@ -59,20 +61,133 @@ SCI_2000 <- kelpWatch_SCI %>%
   filter(!is.na(sum_m2))%>%
   filter(year >1999)%>%
   group_by(year)%>%
-  summarise(total_kelpm2 = sum(sum_m2))
+  summarise(total_kelpm2_SCI = sum(sum_m2))
  # mutate(Receiving_County= fct_reorder(Receiving_County,total_applied))
 
-bar_chart_2000 <-ggplot(data=SCI_2000, aes(x=year, y=total_kelpm2)) +
-  geom_bar(stat="identity")+
+bar_chart_2000_SCI <-ggplot(data=SCI_2000, aes(x=year, y=total_kelpm2_SCI)) +
+  geom_bar(stat="identity", fill = "darkgreen")+
   scale_y_continuous(labels = comma)+
-  scale_x_continuous(breaks=seq(2000, 2020, by = 6))+
-  theme_light()+
+  scale_x_continuous(breaks=seq(2000, 2020, by = 2))+
+  theme_classic()+
   xlab("Year") + 
-  ylab("Kelp Canopy Coverage - full SCI (m2)")
+  ylab("Kelp Canopy Coverage - 2000 on SCI (m2)")
 
   
-  bar_chart_2000
+  bar_chart_2000_SCI
+  
+  bmp(file="SCI_2000.bmp",
+width=10, height=5, units="in", res=300)
+plot(bar_chart_2000)
+dev.off()
 
 
+```
+
+```{r}
+#data exploration - SRI
+SRI_full <- kelpWatch_SRI %>%
+  filter(!is.na(sum_m2))%>%
+  group_by(year)%>%
+  summarise(total_kelpm2_SRI = sum(sum_m2))%>%
+  mutate(total_kelp_normalized_SRI = total_kelpm2_SRI/77283)%>%
+  mutate(Island_SRI= "SRI")
+
+View(SRI_full)
+
+bar_chart_full_SRI <-ggplot(data=SRI_full, aes(x=year, y=total_kelpm2_SRI)) +
+  geom_bar(stat="identity",fill = "lightgreen")+
+  scale_y_continuous(labels = comma)+
+  scale_x_continuous(breaks=seq(1984, 2020, by = 6))+
+  theme_classic()+
+  xlab("Year") + 
+  ylab("Kelp Canopy Coverage - full SRI (m2)")
+
+  bar_chart_full_SRI
+  
+  
+  line_chart_full_SRI <-ggplot(data=SRI_full, aes(x=year, y=total_kelpm2_SRI)) +
+  geom_line(stat="identity",fill = "lightgreen")+
+  scale_y_continuous(labels = comma)+
+  scale_x_continuous(breaks=seq(1984, 2020, by = 6))+
+  theme_classic()+
+  xlab("Year") + 
+  ylab("Kelp Canopy Coverage - full SRI (m2)")
+
+  line_chart_full_SRI
+
+
+bmp(file="SRI_full.bmp",
+width=10, height=5, units="in", res=300)
+plot(bar_chart_full)
+dev.off()
+
+#2000-2020
+SRI_2000 <- kelpWatch_SRI %>%
+  filter(!is.na(sum_m2))%>%
+  filter(year >1999)%>%
+  group_by(year)%>%
+  summarise(total_kelpm2_SRI = sum(sum_m2))
+ # mutate(Receiving_County= fct_reorder(Receiving_County,total_applied))
+
+bar_chart_2000_SRI<-ggplot(data=SRI_2000, aes(x=year, y=total_kelpm2_SRI)) +
+  geom_bar(stat="identity", fill = "lightgreen")+
+  scale_y_continuous(labels = comma)+
+  scale_x_continuous(breaks=seq(2000, 2020, by = 2))+
+  theme_classic()+
+  xlab("Year") + 
+  ylab("Kelp Canopy Coverage - 2000 on SRI (m2)")
+
+  
+  bar_chart_2000_SRI
+  
+  bmp(file="SCI_2000.bmp",
+width=10, height=5, units="in", res=300)
+plot(bar_chart_2000)
+dev.off()
+
+```
+
+
+```{r}
+#SRi and SCi combined
+#2000-2020
+
+SRI_SCI<-merge(SCI_full, SRI_full, by = "year")
+View(SRI_SCI)
+
+    
+   SCI_SRI<- ggplot() +
+    geom_line(data = SRI_SCI, aes(y=total_kelpm2_SRI, x=year, colour = "blue"), size =1, )+
+    geom_line(data = SRI_SCI, aes(y=total_kelpm2_SCI, x=year, colour = "red"), size =1,)+
+    scale_colour_discrete(name = "Island", labels = c("SRI","SCI"))+
+    scale_y_continuous(labels = comma,
+                       name = "Kelp Canopy Coverage (m2)")+
+    scale_x_continuous(breaks=seq(1984, 2020, by = 6))+
+    xlab("Year") +
+    theme_classic()
+    
+    
+    bmp(file="SCI_SRI.bmp",
+width=10, height=5, units="in", res=300)
+plot(SCI_SRI)
+dev.off()
+    
+    
+   SCI_SRI_normalized<- ggplot() +
+    geom_line(data = SRI_SCI, aes(y=total_kelp_normalized_SRI, x=year, colour = "blue"), size =1, )+
+    geom_line(data = SRI_SCI, aes(y=total_kelp_normalized_SCI, x=year, colour = "red"), size =1,)+
+    scale_colour_discrete(name = "Island", labels = c("SRI","SCI"))+
+    scale_y_continuous(labels = comma,
+                       name = "Kelp Canopy Coverage, normalized (m2 kelp/ m island perimeter)")+
+    scale_x_continuous(breaks=seq(1984, 2020, by = 6))+
+    xlab("Year") +
+    theme_classic()
+   normalized
+   
+    bmp(file="SCI_SRI_normalized.bmp",
+width=10, height=5, units="in", res=300)
+plot(SCI_SRI_normalized)
+dev.off()
+  
 ```
 
