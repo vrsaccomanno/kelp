@@ -1,0 +1,71 @@
+---
+title: "KW_coastwide"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readr)
+library(ggplot2)
+library(scales)
+```
+
+```{r}
+#loaddata
+#full coast
+KW_Coastwide <- read_csv("C:/Users/v.r.saccomanno/Box/GitHub/kelp/KW_Coast_wide.csv")
+View(KW_Coastwide)
+
+```
+
+
+```{r}
+#data exploration - SCI
+coast_full <- KW_Coastwide %>%
+  filter(!is.na(sum_m2))%>%
+  group_by(year)%>%
+  summarise(total_kelpm2 = sum(sum_m2))
+View(coast_full)
+
+pre_MHW<- subset(coast_full, year<=2013)%>%
+  mutate(average_kelp = mean(total_kelpm2))%>%
+  mutate(stdev_kelp = sd(total_kelpm2))
+View(pre_MHW)
+
+mid_MHW<- subset(coast_full, year>=2015& year<)%>%
+  mutate(average_kelp = mean(total_kelpm2))%>%
+  mutate(stdev_kelp = sd(total_kelpm2))
+
+post_MHW<- subset(coast_full, year>=2016)%>%
+  mutate(stdev_kelp = sd(total_kelpm2))%>%
+  mutate(average_kelp = mean(total_kelpm2))
+View(post_MHW)
+
+bar_chart_pre_post<- ggplot()+
+  geom_bar(data=pre_MHW, aes(x="1984-2014", y="1975316"), stat="identity",fill = "darkgreen")+
+  geom_bar(data=post_MHW, aes(x="2016", y="62842.6"), stat="identity", fill = "darkgreen")+
+  xlab("Year") + 
+  ylab("Kelp Canopy Coverage(m2)")
+
+
+bar_chart_full_NorCoast <-ggplot(data=coast_full, aes(x=year, y=total_kelpm2)) +
+  geom_bar(stat="identity",fill = "darkgreen")+
+  scale_y_continuous(labels = comma)+
+  scale_x_continuous(breaks=seq(1984, 2020, by = 6))+
+  theme_classic()+
+  xlab("Year") + 
+  ylab("Kelp Canopy Coverage(m2)")
+
+  bar_chart_full_NorCoast
+
+
+bmp(file="NorthCoast_Kelp_Canopy.bmp",
+width=10, height=5, units="in", res=300)
+plot(bar_chart_full_NorCoast)
+dev.off()
+
+```
